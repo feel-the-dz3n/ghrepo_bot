@@ -19,7 +19,65 @@ namespace TelegramGitHubBot
 
         static void Main(string[] args)
         {
+            if (!File.Exists(".token"))
+            {
+                Console.WriteLine("Put your Telegram bot token in .token file");
+                return;
+            } 
+
             botClient = new TelegramBotClient(new FileTokenProvider(".token").Get());
+
+            if (args.Contains("--oauth-gen"))
+            {
+                if (!File.Exists(".github_clientid"))
+                {
+                    Console.WriteLine("Put your client id into .github_clientid");
+                    return;
+                }
+
+                var request = new OauthLoginRequest(new FileTokenProvider(".github_clientid").Get())
+                {
+                    Scopes = { "read:user" }
+                };
+                var oauthLoginUrl = github.Oauth.GetGitHubLoginUrl(request);
+                Console.WriteLine(oauthLoginUrl);
+                return;
+            }
+
+            if (!File.Exists(".github_token") && File.Exists(".github_clientid") 
+                && File.Exists(".github_clientsecret") && File.Exists(".github_authcode"))
+            {
+                Console.WriteLine("Fetching token from GitHub...");
+
+                var clientid = new FileTokenProvider(".github_clientid").Get();
+                var clientsecret = new FileTokenProvider(".github_clientsecret").Get();
+                var code = new FileTokenProvider(".github_authcode").Get();
+                var token = github.Oauth.CreateAccessToken(new OauthTokenRequest(clientid, clientsecret, code)).GetAwaiter().GetResult();
+
+                if (string.IsNullOrWhiteSpace(token.AccessToken))
+                {
+                    Console.WriteLine("Fatal error: can't fetch token");
+                    Console.WriteLine("Try to get a new oauth code using --oauth-gen");
+                    return;
+                }
+
+                using (var w = new StreamWriter(".github_token"))
+                    w.Write(token.AccessToken);
+
+                Console.WriteLine("Done. Saved to .github_token");
+            }
+
+            if (File.Exists(".github_token"))
+            {
+                github.Credentials = new Credentials(new FileTokenProvider(".github_token").Get());
+                Console.WriteLine("Using private GitHub account.");
+            }
+            else
+            {
+                Console.WriteLine("Using limited guest GitHub account.");
+                Console.WriteLine("Put your GitHub Ouath code into .github_authcode");
+                Console.WriteLine("Use --oauth-gen argument to generate OAuth link.");
+            }
 
             var me = botClient.GetMeAsync().Result;
             Console.WriteLine($"Working with {me.FirstName}.");
