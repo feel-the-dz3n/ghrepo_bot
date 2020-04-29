@@ -15,17 +15,38 @@ namespace TelegramGitHubBot
                 if (string.IsNullOrWhiteSpace(input))
                     throw new Exception("Enter login or owner/repository!");
 
-                if (input.Contains("/"))
+                if (input.StartsWith("search"))
                 {
-                    var qArgs = input.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                    result.Type = QueryType.Repository;
-                    result.Owner = qArgs[0].Trim();
-                    result.Repository = qArgs[1].Trim();
+                    result.Type = QueryType.Search;
+
+                    if (input.StartsWith("search user"))
+                    {
+                        result.Type = QueryType.SearchUser;
+                        result.Owner = input.Substring("search user".Length).Trim();
+                        Console.WriteLine(result.Owner);
+                    }
+                    else if (input.StartsWith("search repo"))
+                    {
+                        result.Type = QueryType.SearchRepo;
+                        result.Repository = input.Substring("search repo".Length).Trim();
+                        Console.WriteLine(result.Repository);
+                    }
+                    else throw new Exception("Use: search repo | search user");
                 }
-                else // probably owner
+                else
                 {
-                    result.Type = QueryType.Owner;
-                    result.Owner = input.Trim();
+                    if (input.Contains("/"))
+                    {
+                        var qArgs = input.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                        result.Type = QueryType.Repository;
+                        result.Owner = qArgs[0].Trim();
+                        result.Repository = qArgs[1].Trim();
+                    }
+                    else // probably owner
+                    {
+                        result.Type = QueryType.Owner;
+                        result.Owner = input.Trim();
+                    }
                 }
             }
             catch (Exception ex)

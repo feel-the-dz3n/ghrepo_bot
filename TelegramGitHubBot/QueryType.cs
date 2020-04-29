@@ -7,6 +7,9 @@ namespace TelegramGitHubBot
     public enum QueryType
     {
         Exception,
+        Search,
+        SearchRepo,
+        SearchUser,
         Owner,
         Repository
     }
