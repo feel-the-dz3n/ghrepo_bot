@@ -168,11 +168,11 @@ namespace TelegramGitHubBot
                     catch (NotFoundException)
                     {
                         var repos = github.Search.SearchRepo(new SearchRepositoriesRequest(q.Owner)).GetAwaiter().GetResult();
-                        for (int i = 0; i < repos.Items.Count && i < Limits.MaxSearchEntries / 2; i++)
+                        for (int i = 0; i < repos.Items.Count && i < Limits.HybridSearchLimit; i++)
                             results.Add(InlineFromRepo(github.Repository.Get(repos.Items[i].Id).GetAwaiter().GetResult()));
 
                         var users = github.Search.SearchUsers(new SearchUsersRequest(q.Owner)).GetAwaiter().GetResult();
-                        for (int i = 0; i < users.Items.Count && i < Limits.MaxSearchEntries / 2; i++)
+                        for (int i = 0; i < users.Items.Count && i < Limits.HybridSearchLimit; i++)
                             results.Add(InlineFromUser(github.User.Get(users.Items[i].Login).GetAwaiter().GetResult()));
                     }
 
@@ -185,7 +185,7 @@ namespace TelegramGitHubBot
 
                     if (repos.Items.Count <= 0) throw new Exception("No repos found");
 
-                    for (int i = 0; i < repos.Items.Count && i < Limits.MaxSearchEntries; i++)
+                    for (int i = 0; i < repos.Items.Count && i < Limits.CleanSearchLimit; i++)
                         results.Add(InlineFromRepo(github.Repository.Get(repos.Items[i].Id).GetAwaiter().GetResult()));
                 }
                 else if (q.Type == QueryType.SearchUser)
@@ -194,7 +194,7 @@ namespace TelegramGitHubBot
 
                     if (users.Items.Count <= 0) throw new Exception("No users found");
 
-                    for (int i = 0; i < users.Items.Count && i < Limits.MaxSearchEntries; i++)
+                    for (int i = 0; i < users.Items.Count && i < Limits.CleanSearchLimit; i++)
                         results.Add(InlineFromUser(github.User.Get(users.Items[i].Login).GetAwaiter().GetResult()));
                 }
             }

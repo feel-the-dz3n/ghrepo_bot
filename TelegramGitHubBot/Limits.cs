@@ -6,6 +6,7 @@ namespace TelegramGitHubBot
 {
     public class Limits
     {
-        public const int MaxSearchEntries = 6;
+        public static int CleanSearchLimit = 6;
+        public static int HybridSearchLimit => CleanSearchLimit / 2;
     }
 }
