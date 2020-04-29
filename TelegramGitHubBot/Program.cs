@@ -95,6 +95,9 @@ namespace TelegramGitHubBot
             {
                 var text = new StringBuilder();
 
+#if DEBUG
+                text.AppendLine("Debug build");
+#endif
                 text.AppendLine("System: " + Environment.OSVersion.VersionString);
                 text.AppendLine("Clean search limit: " + Limits.CleanSearchLimit);
                 text.AppendLine("Hybrid search limit: " + Limits.HybridSearchLimit);
