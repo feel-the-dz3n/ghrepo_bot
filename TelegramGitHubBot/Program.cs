@@ -42,8 +42,8 @@ namespace TelegramGitHubBot
             {
                 var q = QueryParser.Parse(e.InlineQuery.Query);
                 if (q.Type == QueryType.Error) throw q.Exception;
-                else if (q.Type == QueryType.NotFound) throw new Exception("🔴 Not found");
-                else if (q.Type == QueryType.Wrong) throw new Exception("🔴 Something is wrong");
+                else if (q.Type == QueryType.NotFound) throw new Exception("Not found");
+                else if (q.Type == QueryType.Wrong) throw new Exception("Something is wrong");
                 else if (q.Type == QueryType.Repository)
                 {
                     var repo = github.Repository.Get(q.Owner, q.Repository).GetAwaiter().GetResult();
@@ -109,7 +109,7 @@ namespace TelegramGitHubBot
                 Console.WriteLine(ex);
 
                 var result = new InlineQueryResultArticle(
-                   "0", ex.Message, new InputTextMessageContent(ex.ToString()));
+                   "0", "🔴 ERROR: " + ex.Message, new InputTextMessageContent(ex.ToString()));
 
                 results.Add(result);
             }
