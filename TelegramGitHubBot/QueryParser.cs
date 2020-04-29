@@ -8,10 +8,13 @@ namespace TelegramGitHubBot
     {
         public static QueryInfo Parse(string input)
         {
-            var result = new QueryInfo(QueryType.Error);
+            var result = new QueryInfo();
 
             try
             {
+                if (string.IsNullOrWhiteSpace(input))
+                    throw new Exception("Enter login or owner/repository!");
+
                 if (input.Contains("/"))
                 {
                     var qArgs = input.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -27,7 +30,7 @@ namespace TelegramGitHubBot
             }
             catch (Exception ex)
             {
-                result.Type = QueryType.Error;
+                result.Type = QueryType.Exception;
                 result.Exception = ex;
             }
 

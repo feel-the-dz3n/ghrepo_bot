@@ -11,7 +11,7 @@ namespace TelegramGitHubBot
         public string Owner { get; internal set; }
         public string Repository { get; internal set; }
 
-        public QueryInfo(QueryType type)
+        public QueryInfo(QueryType type = QueryType.Exception)
         {
             this.Type = type;
         }
