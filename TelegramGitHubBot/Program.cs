@@ -87,10 +87,14 @@ namespace TelegramGitHubBot
                         text.AppendLine("Location: " + owner.Location);
 
                     text.AppendLine();
-                    text.AppendLine(" - Public repos: " + owner.PublicRepos);
-                    text.AppendLine(" - Private repos: " + owner.TotalPrivateRepos);
-                    text.AppendLine(" - Public gists: " + owner.PublicGists);
-                    if(owner.PrivateGists != null) text.AppendLine(" - Private gists: " + owner.PrivateGists);
+                    if (owner.PublicRepos > 0)
+                        text.AppendLine(" - Public repos: " + owner.PublicRepos);
+                    if (owner.OwnedPrivateRepos > 0)
+                        text.AppendLine(" - Private repos: " + owner.OwnedPrivateRepos);
+                    if (owner.PublicGists > 0)
+                        text.AppendLine(" - Public gists: " + owner.PublicGists);
+                    if(owner.PrivateGists != null) 
+                        text.AppendLine(" - Private gists: " + owner.PrivateGists);
                     text.AppendLine();
 
                     text.AppendLine(owner.HtmlUrl);
