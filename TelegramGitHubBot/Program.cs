@@ -83,9 +83,25 @@ namespace TelegramGitHubBot
             Console.WriteLine($"Working with {me.FirstName}.");
 
             botClient.OnInlineQuery += BotClient_OnInlineQuery;
+            botClient.OnMessage += BotClient_OnMessage;
             botClient.StartReceiving();
 
             Thread.Sleep(-1);
+        }
+
+        private static void BotClient_OnMessage(object sender, MessageEventArgs e)
+        {
+            if (e.Message.Text == "/info")
+            {
+                var text = new StringBuilder();
+
+                text.AppendLine("System: " + Environment.OSVersion.VersionString);
+                text.AppendLine("Clean search limit: " + Limits.CleanSearchLimit);
+                text.AppendLine("Hybrid search limit: " + Limits.HybridSearchLimit);
+                text.AppendLine("GitHub auth: " + github.Credentials.AuthenticationType);
+
+                botClient.SendTextMessageAsync(e.Message.Chat, text.ToString());
+            }
         }
 
         static InlineQueryResultArticle InlineFromRepo(Repository repo)
