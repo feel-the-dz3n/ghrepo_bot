@@ -23,13 +23,11 @@ namespace TelegramGitHubBot
                     {
                         result.Type = QueryType.SearchUser;
                         result.Owner = input.Substring("search user".Length).Trim();
-                        Console.WriteLine(result.Owner);
                     }
                     else if (input.StartsWith("search repo"))
                     {
                         result.Type = QueryType.SearchRepo;
                         result.Repository = input.Substring("search repo".Length).Trim();
-                        Console.WriteLine(result.Repository);
                     }
                     else throw new Exception("Use: search repo | search user");
                 }
