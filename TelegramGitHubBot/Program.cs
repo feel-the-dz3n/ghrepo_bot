@@ -65,7 +65,7 @@ namespace TelegramGitHubBot
                 Console.WriteLine("Done. Saved to .github_token");
             }
 
-            if (File.Exists(".github_token"))
+            if (!args.Contains("--no-github") && File.Exists(".github_token"))
             {
                 github.Credentials = new Credentials(new FileTokenProvider(".github_token").Get());
                 Console.WriteLine("Using private GitHub account.");
