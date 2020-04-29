@@ -20,18 +20,12 @@ namespace TelegramGitHubBot
             botClient = new TelegramBotClient(new FileTokenProvider(".token").Get());
 
             var me = botClient.GetMeAsync().Result;
-            Console.WriteLine($"Hello, World! I am user {me.Id} and my name is {me.FirstName}.");
+            Console.WriteLine($"Working with {me.FirstName}.");
 
-            botClient.OnMessage += BotClient_OnMessage;
             botClient.OnInlineQuery += BotClient_OnInlineQuery;
-            botClient.OnInlineResultChosen += BotClient_OnInlineResultChosen;
             botClient.StartReceiving();
 
             Thread.Sleep(-1);
-        }
-
-        private static void BotClient_OnInlineResultChosen(object sender, ChosenInlineResultEventArgs e)
-        {
         }
 
         private static void BotClient_OnInlineQuery(object sender, InlineQueryEventArgs e)
@@ -113,10 +107,6 @@ namespace TelegramGitHubBot
             }
 
             botClient.AnswerInlineQueryAsync(e.InlineQuery.Id, results);
-        }
-
-        private static void BotClient_OnMessage(object sender, MessageEventArgs e)
-        {
         }
     }
 }
