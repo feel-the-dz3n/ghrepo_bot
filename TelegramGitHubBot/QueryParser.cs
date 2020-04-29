@@ -17,8 +17,6 @@ namespace TelegramGitHubBot
 
                 if (input.StartsWith("search"))
                 {
-                    result.Type = QueryType.Search;
-
                     if (input.StartsWith("search user"))
                     {
                         result.Type = QueryType.SearchUser;
@@ -42,7 +40,7 @@ namespace TelegramGitHubBot
                     }
                     else // probably owner
                     {
-                        result.Type = QueryType.Owner;
+                        result.Type = QueryType.SearchOrOwner;
                         result.Owner = input.Trim();
                     }
                 }

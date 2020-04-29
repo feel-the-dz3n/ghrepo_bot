@@ -25,8 +25,6 @@ namespace TelegramGitHubBot
                 return;
             } 
 
-            botClient = new TelegramBotClient(new FileTokenProvider(".token").Get());
-
             if (args.Contains("--oauth-gen"))
             {
                 if (!File.Exists(".github_clientid"))
@@ -79,6 +77,8 @@ namespace TelegramGitHubBot
                 Console.WriteLine("Use --oauth-gen argument to generate OAuth link.");
             }
 
+
+            botClient = new TelegramBotClient(new FileTokenProvider(".token").Get());
             var me = botClient.GetMeAsync().Result;
             Console.WriteLine($"Working with {me.FirstName}.");
 
@@ -158,10 +158,26 @@ namespace TelegramGitHubBot
                     var repo = github.Repository.Get(q.Owner, q.Repository).GetAwaiter().GetResult();
                     results.Add(InlineFromRepo(repo));
                 }
-                else if (q.Type == QueryType.Owner)
+                else if (q.Type == QueryType.SearchOrOwner)
                 {
-                    var owner = github.User.Get(q.Owner).GetAwaiter().GetResult();
-                    results.Add(InlineFromUser(owner));
+                    try
+                    {
+                        var owner = github.User.Get(q.Owner).GetAwaiter().GetResult();
+                        results.Add(InlineFromUser(owner));
+                    }
+                    catch (NotFoundException)
+                    {
+                        var repos = github.Search.SearchRepo(new SearchRepositoriesRequest(q.Owner)).GetAwaiter().GetResult();
+                        for (int i = 0; i < repos.Items.Count && i < Limits.MaxSearchEntries / 2; i++)
+                            results.Add(InlineFromRepo(github.Repository.Get(repos.Items[i].Id).GetAwaiter().GetResult()));
+
+                        var users = github.Search.SearchUsers(new SearchUsersRequest(q.Owner)).GetAwaiter().GetResult();
+                        for (int i = 0; i < users.Items.Count && i < Limits.MaxSearchEntries / 2; i++)
+                            results.Add(InlineFromUser(github.User.Get(users.Items[i].Login).GetAwaiter().GetResult()));
+                    }
+
+                    if (results.Count <= 0)
+                        throw new Exception("Nothing found.");
                 }
                 else if (q.Type == QueryType.SearchRepo)
                 {
@@ -169,7 +185,7 @@ namespace TelegramGitHubBot
 
                     if (repos.Items.Count <= 0) throw new Exception("No repos found");
 
-                    for (int i = 0; i < repos.Items.Count && i < 5; i++)
+                    for (int i = 0; i < repos.Items.Count && i < Limits.MaxSearchEntries; i++)
                         results.Add(InlineFromRepo(github.Repository.Get(repos.Items[i].Id).GetAwaiter().GetResult()));
                 }
                 else if (q.Type == QueryType.SearchUser)
@@ -178,7 +194,7 @@ namespace TelegramGitHubBot
 
                     if (users.Items.Count <= 0) throw new Exception("No users found");
 
-                    for (int i = 0; i < users.Items.Count && i < 5; i++)
+                    for (int i = 0; i < users.Items.Count && i < Limits.MaxSearchEntries; i++)
                         results.Add(InlineFromUser(github.User.Get(users.Items[i].Login).GetAwaiter().GetResult()));
                 }
             }
