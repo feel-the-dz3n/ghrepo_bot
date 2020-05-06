@@ -19,7 +19,7 @@ namespace TelegramGitHubBot
 
         static void Main(string[] args)
         {
-            if (!File.Exists(".token"))
+            if (!File.Exists("./.token"))
             {
                 Console.WriteLine("Put your Telegram bot token in .token file");
                 return;
@@ -33,7 +33,7 @@ namespace TelegramGitHubBot
                     return;
                 }
 
-                var request = new OauthLoginRequest(new FileTokenProvider(".github_clientid").Get())
+                var request = new OauthLoginRequest(new FileTokenProvider("./.github_clientid").Get())
                 {
                     Scopes = { "read:user" }
                 };
@@ -42,14 +42,14 @@ namespace TelegramGitHubBot
                 return;
             }
 
-            if (!File.Exists(".github_token") && File.Exists(".github_clientid") 
-                && File.Exists(".github_clientsecret") && File.Exists(".github_authcode"))
+            if (!File.Exists("./.github_token") && File.Exists("./.github_clientid") 
+                && File.Exists("./.github_clientsecret") && File.Exists("./.github_authcode"))
             {
                 Console.WriteLine("Fetching token from GitHub...");
 
-                var clientid = new FileTokenProvider(".github_clientid").Get();
-                var clientsecret = new FileTokenProvider(".github_clientsecret").Get();
-                var code = new FileTokenProvider(".github_authcode").Get();
+                var clientid = new FileTokenProvider("./.github_clientid").Get();
+                var clientsecret = new FileTokenProvider("./.github_clientsecret").Get();
+                var code = new FileTokenProvider("./.github_authcode").Get();
                 var token = github.Oauth.CreateAccessToken(new OauthTokenRequest(clientid, clientsecret, code)).GetAwaiter().GetResult();
 
                 if (string.IsNullOrWhiteSpace(token.AccessToken))
@@ -59,15 +59,15 @@ namespace TelegramGitHubBot
                     return;
                 }
 
-                using (var w = new StreamWriter(".github_token"))
+                using (var w = new StreamWriter("./.github_token"))
                     w.Write(token.AccessToken);
 
                 Console.WriteLine("Done. Saved to .github_token");
             }
 
-            if (!args.Contains("--no-github") && File.Exists(".github_token"))
+            if (!args.Contains("--no-github") && File.Exists("./.github_token"))
             {
-                github.Credentials = new Credentials(new FileTokenProvider(".github_token").Get());
+                github.Credentials = new Credentials(new FileTokenProvider("./.github_token").Get());
                 Console.WriteLine("Using private GitHub account.");
             }
             else
@@ -78,7 +78,7 @@ namespace TelegramGitHubBot
             }
 
 
-            botClient = new TelegramBotClient(new FileTokenProvider(".token").Get());
+            botClient = new TelegramBotClient(new FileTokenProvider("./.token").Get());
             var me = botClient.GetMeAsync().Result;
             Console.WriteLine($"Working with {me.FirstName}.");
 
